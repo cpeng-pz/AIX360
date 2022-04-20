@@ -57,11 +57,11 @@ class AEADEN:
         self.global_step = tf.Variable(0.0, trainable=False)
 
         # and here's what we use to assign them
-        self.assign_orig_img = tf.placeholder(tf.float32, shape)
-        self.assign_adv_img = tf.placeholder(tf.float32, shape)
-        self.assign_adv_img_s = tf.placeholder(tf.float32, shape)
-        self.assign_target_lab = tf.placeholder(tf.float32, (batch_size, num_classes))
-        self.assign_const = tf.placeholder(tf.float32, [batch_size])
+        self.assign_orig_img = tf.compat.v1.placeholder(tf.float32, shape)
+        self.assign_adv_img = tf.compat.v1.placeholder(tf.float32, shape)
+        self.assign_adv_img_s = tf.compat.v1.placeholder(tf.float32, shape)
+        self.assign_target_lab = tf.compat.v1.placeholder(tf.float32, (batch_size, num_classes))
+        self.assign_const = tf.compat.v1.placeholder(tf.float32, [batch_size])
 
         """Fast Iterative Soft Thresholding"""
         """--------------------------------"""
@@ -148,8 +148,8 @@ class AEADEN:
         # elif self.mode == "PN":
         #     self.assign_adv_img_s = tf.multiply(cond6, self.assign_adv_img_s) + tf.multiply(cond7, self.orig_img)
 
-        self.adv_updater = tf.assign(self.adv_img, self.assign_adv_img)
-        self.adv_updater_s = tf.assign(self.adv_img_s, self.assign_adv_img_s)
+        self.adv_updater = tf.compat.v1.assign(self.adv_img, self.assign_adv_img)
+        self.adv_updater_s = tf.compat.v1.assign(self.adv_img_s, self.assign_adv_img_s)
 
         """--------------------------------"""
         # prediction BEFORE-SOFTMAX of the model
@@ -210,13 +210,13 @@ class AEADEN:
         self.Loss_Overall = self.Loss_Attack + self.Loss_L2Dist + self.Loss_AE_Dist + tf.multiply(self.beta,
                                                                                                 self.Loss_L1Dist)
 
-        self.learning_rate = tf.train.polynomial_decay(self.INIT_LEARNING_RATE, self.global_step, self.MAX_ITERATIONS,
+        self.learning_rate = tf.compat.v1.train.polynomial_decay(self.INIT_LEARNING_RATE, self.global_step, self.MAX_ITERATIONS,
                                                        0,
                                                        power=0.5)
-        optimizer = tf.train.GradientDescentOptimizer(self.learning_rate)
-        start_vars = set(x.name for x in tf.global_variables())
+        optimizer = tf.compat.v1.train.GradientDescentOptimizer(self.learning_rate)
+        start_vars = set(x.name for x in tf.compat.v1.global_variables())
         self.train = optimizer.minimize(self.Loss_ToOptimize, var_list=[self.adv_img_s], global_step=self.global_step) # gradient of g(delta) in paper is subtracted from self.adv_img_s
-        end_vars = tf.global_variables()
+        end_vars = tf.compat.v1.global_variables()
         new_vars = [x for x in end_vars if x.name not in start_vars]
 
         # these are the variables to initialize when we run
@@ -227,7 +227,7 @@ class AEADEN:
         self.setup.append(self.adv_img.assign(self.assign_adv_img))
         self.setup.append(self.adv_img_s.assign(self.assign_adv_img_s))
 
-        self.init = tf.variables_initializer(var_list=[self.global_step] + [self.adv_img_s] + [self.adv_img] + new_vars)
+        self.init = tf.compat.v1.variables_initializer(var_list=[self.global_step] + [self.adv_img_s] + [self.adv_img] + new_vars)
 
     def attack(self, imgs, labs):
         """

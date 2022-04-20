@@ -16,8 +16,8 @@
 import sys, os
 import tensorflow as tf
 import numpy as np
-from tensorflow.contrib.keras.api.keras.models import Model, Sequential, model_from_json
-from tensorflow.contrib.keras.api.keras.callbacks import ModelCheckpoint
+from tensorflow.keras.models import Model, Sequential, model_from_json
+from tensorflow.keras.callbacks import ModelCheckpoint
 
 class AEADEN:
     def __init__(self, sess, model, mask_mat, mode, batch_size, kappa, init_learning_rate,
@@ -104,13 +104,13 @@ class AEADEN:
         self.global_step = tf.Variable(0.0, trainable=False)
 
         # and here's what we use to assign them
-        self.assign_orig_img = tf.placeholder(tf.float32, shape)
-        self.assign_mask_vec = tf.placeholder(tf.float32, mask_vec_shape)
-        self.assign_mask_vec_s = tf.placeholder(tf.float32, mask_vec_shape)
-        # self.assign_img_mask = tf.placeholder(tf.float32, mask_shape)
-        # self.assign_img_mask_s = tf.placeholder(tf.float32, mask_shape)
-        self.assign_target_lab = tf.placeholder(tf.float32, (batch_size,nun_classes))
-        self.assign_const = tf.placeholder(tf.float32, [batch_size])
+        self.assign_orig_img = tf.compat.v1.placeholder(tf.float32, shape)
+        self.assign_mask_vec = tf.compat.v1.placeholder(tf.float32, mask_vec_shape)
+        self.assign_mask_vec_s = tf.compat.v1.placeholder(tf.float32, mask_vec_shape)
+        # self.assign_img_mask = tf.compat.v1.placeholder(tf.float32, mask_shape)
+        # self.assign_img_mask_s = tf.compat.v1.placeholder(tf.float32, mask_shape)
+        self.assign_target_lab = tf.compat.v1.placeholder(tf.float32, (batch_size,nun_classes))
+        self.assign_const = tf.compat.v1.placeholder(tf.float32, [batch_size])
 
 
         """Fast Iterative Soft Thresholding"""
@@ -149,8 +149,8 @@ class AEADEN:
         #     self.assign_adv_img_s = tf.multiply(cond7, self.assign_adv_img_s)+tf.multiply(cond6,self.orig_img)
         # elif self.mode == "PN":
         #     self.assign_adv_img_s = tf.multiply(cond6, self.assign_adv_img_s)+tf.multiply(cond7,self.orig_img)
-        self.mask_updater = tf.assign(self.mask_vec, self.assign_mask_vec)
-        self.mask_updater_s = tf.assign(self.mask_vec_s, self.assign_mask_vec_s)
+        self.mask_updater = tf.compat.v1.assign(self.mask_vec, self.assign_mask_vec)
+        self.mask_updater_s = tf.compat.v1.assign(self.mask_vec_s, self.assign_mask_vec_s)
         """ Thresholding """
 
         # mask_ones = tf.constant(1, tf.float32)
@@ -259,12 +259,12 @@ class AEADEN:
         #self.Loss_Overall    = self.Loss_Attack   + self.Loss_L2Dist   + self.Loss_AE_Dist   + tf.multiply(self.beta, self.Loss_L1Dist)
         self.Loss_Overall    = self.Loss_Attack  + tf.multiply(self.gamma,self.attr_score_s)   + tf.multiply(self.beta, self.Loss_L1Dist)
         #print(self.Loss_Attack.shape, self.Loss_Overall.shape)
-        self.learning_rate = tf.train.polynomial_decay(self.INIT_LEARNING_RATE, self.global_step, self.MAX_ITERATIONS, 0, power=0.5)
-        optimizer = tf.train.GradientDescentOptimizer(self.learning_rate)
-        start_vars = set(x.name for x in tf.global_variables())
+        self.learning_rate = tf.compat.v1.train.polynomial_decay(self.INIT_LEARNING_RATE, self.global_step, self.MAX_ITERATIONS, 0, power=0.5)
+        optimizer = tf.compat.v1.train.GradientDescentOptimizer(self.learning_rate)
+        start_vars = set(x.name for x in tf.compat.v1.global_variables())
         # self.train = optimizer.minimize(self.Loss_ToOptimize, var_list=[self.adv_img_s], global_step=self.global_step)
         self.train = optimizer.minimize(self.Loss_ToOptimize, var_list=[self.mask_vec_s], global_step=self.global_step)
-        end_vars = tf.global_variables()
+        end_vars = tf.compat.v1.global_variables()
         new_vars = [x for x in end_vars if x.name not in start_vars]
 
         # these are the variables to initialize when we run
@@ -275,7 +275,7 @@ class AEADEN:
         self.setup.append(self.mask_vec.assign(self.assign_mask_vec))
         self.setup.append(self.mask_vec_s.assign(self.assign_mask_vec_s))
 
-        self.init = tf.variables_initializer(var_list=[self.global_step]+[self.mask_vec_s]+[self.mask_vec]+new_vars)
+        self.init = tf.compat.v1.variables_initializer(var_list=[self.global_step]+[self.mask_vec_s]+[self.mask_vec]+new_vars)
 
     def attack(self, imgs, labs):
         """

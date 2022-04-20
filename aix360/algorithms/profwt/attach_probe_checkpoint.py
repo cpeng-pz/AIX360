@@ -14,7 +14,7 @@ def print_layer_labels(checkpoint_path):
 	Parameters:
 	checkpoint_path (string): Path to the checkpoint filename where the tensorflow checkpoint is stored.
 	"""
-	g= tf.train.import_meta_graph(checkpoint_path+'.meta')
+	g= tf.compat.v1.train.import_meta_graph(checkpoint_path+'.meta')
 	graph = tf.get_default_graph()
 	print(graph.get_operations())
 	tf.reset_default_graph()
@@ -39,7 +39,7 @@ def attach_probe_eval(input_features_name,label_name,operation_name,x_train2,y_t
 	"""
 
 	# Build the computation graph correpsonding to the trained model from the checkpoint
-	g= tf.train.import_meta_graph(checkpoint_path+'.meta')
+	g= tf.compat.v1.train.import_meta_graph(checkpoint_path+'.meta')
 	graph = tf.get_default_graph()
 	# Get the tensor corresponding to the operation
 	a=graph.get_tensor_by_name(operation_name)
@@ -58,7 +58,7 @@ def attach_probe_eval(input_features_name,label_name,operation_name,x_train2,y_t
 	# Loads the weights in the computation graph and evaluate the probe tensor on all samples provided
 	batch_size=500
 
-	saver=tf.train.Saver()
+	saver=tf.compat.v1.train.Saver()
 	with tf.Session() as sess:      
 		saver.restore(sess,checkpoint_path)
 		num_examples=len(x_train2)

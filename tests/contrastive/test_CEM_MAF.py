@@ -30,7 +30,7 @@ class TestCEM_MAFImageExplainer(unittest.TestCase):
         with tf.Session() as sess: # Open TensorFlow Session
             random.seed(121)
             np.random.seed(1211)
-            sess.run(tf.global_variables_initializer())
+            sess.run(tf.compat.v1.global_variables_initializer())
         
             # Fix attributes to use for test
             attributes = ["Brown_Hair", "High_Cheekbones"]

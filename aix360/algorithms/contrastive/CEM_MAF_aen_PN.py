@@ -17,8 +17,8 @@ import sys
 import tensorflow as tf
 import numpy as np
 import pickle
-from tensorflow.contrib.keras.api.keras.models import Model, Sequential, model_from_json
-from tensorflow.contrib.keras.api.keras.callbacks import ModelCheckpoint
+from tensorflow.keras.models import Model, Sequential, model_from_json
+from tensorflow.keras.callbacks import ModelCheckpoint
 import os
 
 class AEADEN:
@@ -83,11 +83,11 @@ class AEADEN:
         self.global_step = tf.Variable(0.0, trainable=False)
 
         # and here's what we use to assign them
-        self.assign_orig_img = tf.placeholder(tf.float32, shape)
-        self.assign_orig_latent = tf.placeholder(tf.float32, latent_shape, name="assign_orig_latent")
-        self.assign_adv_latent = tf.placeholder(tf.float32, latent_shape, name="assign_adv_latent")
-        self.assign_target_lab = tf.placeholder(tf.float32, (batch_size,nun_classes), name="assign_target_label")
-        self.assign_const = tf.placeholder(tf.float32, [batch_size])
+        self.assign_orig_img = tf.compat.v1.placeholder(tf.float32, shape)
+        self.assign_orig_latent = tf.compat.v1.placeholder(tf.float32, latent_shape, name="assign_orig_latent")
+        self.assign_adv_latent = tf.compat.v1.placeholder(tf.float32, latent_shape, name="assign_adv_latent")
+        self.assign_target_lab = tf.compat.v1.placeholder(tf.float32, (batch_size,nun_classes), name="assign_target_label")
+        self.assign_const = tf.compat.v1.placeholder(tf.float32, [batch_size])
 
         ### Load attribute classifier
         nn_type = "simple"
@@ -122,7 +122,7 @@ class AEADEN:
         with open(os.path.join(aix360_path, 'algorithms/contrastive/progressive_growing_of_gans/karras2018iclr-celebahq-1024x1024.pkl'), 'rb') as file:
             G, D, Gs = pickle.load(file)
         # inputs, redundent ...
-        # in_labels = tf.placeholder(tf.float32, shape=(None, 0))
+        # in_labels = tf.compat.v1.placeholder(tf.float32, shape=(None, 0))
         in_labels = tf.constant(0, shape=(1, 0))
         # get the GAN network, 
         with tf.variable_scope(Gs.scope, reuse=tf.AUTO_REUSE):
@@ -131,7 +131,7 @@ class AEADEN:
             resize_image= tf.image.resize_images(tanspose_image, [224, 224])
             self.adv_img = tf.clip_by_value(resize_image/2, -0.5, 0.5)
         
-        self.adv_updater = tf.assign(self.adv_latent, self.assign_adv_latent)
+        self.adv_updater = tf.compat.v1.assign(self.adv_latent, self.assign_adv_latent)
 
         """--------------------------------"""
         # prediction BEFORE-SOFTMAX of the model
@@ -191,11 +191,11 @@ class AEADEN:
         self.Loss_Overall    = self.Loss_Latent_L2Dist + self.Loss_Img_L2Dist + self.Loss_Attack + self.Loss_attr + self.Loss_attr_penalty
         # self.Loss_Overall    = self.Loss_Attack
 
-        self.learning_rate = tf.train.polynomial_decay(self.INIT_LEARNING_RATE, self.global_step, self.MAX_ITERATIONS, 0, power=0.5)
-        optimizer = tf.train.GradientDescentOptimizer(self.learning_rate)
-        start_vars = set(x.name for x in tf.global_variables())
+        self.learning_rate = tf.compat.v1.train.polynomial_decay(self.INIT_LEARNING_RATE, self.global_step, self.MAX_ITERATIONS, 0, power=0.5)
+        optimizer = tf.compat.v1.train.GradientDescentOptimizer(self.learning_rate)
+        start_vars = set(x.name for x in tf.compat.v1.global_variables())
         self.train = optimizer.minimize(self.Loss_Overall, var_list=[self.adv_latent], global_step=self.global_step)
-        end_vars = tf.global_variables()
+        end_vars = tf.compat.v1.global_variables()
         new_vars = [x for x in end_vars if x.name not in start_vars]
 
         # these are the variables to initialize when we run
@@ -207,7 +207,7 @@ class AEADEN:
         self.setup.append(self.const.assign(self.assign_const))
         
 
-        self.init = tf.variables_initializer(var_list=[self.global_step]+[self.adv_latent]+new_vars)
+        self.init = tf.compat.v1.variables_initializer(var_list=[self.global_step]+[self.adv_latent]+new_vars)
 
     def attack(self, imgs, labs, latent):
         """

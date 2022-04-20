@@ -57,8 +57,8 @@ def probe_train_eval(probe_train_input,y_train1,num_classes,probe_eval_input,y_t
   columns=probe_val.shape[1]
   probe_optimizer='mom'
 
-  probe_input=tf.placeholder(tf.float32,shape=(None,columns))
-  probe_labels=tf.placeholder(tf.float32,shape=(None,num_classes))
+  probe_input=tf.compat.v1.placeholder(tf.float32,shape=(None,columns))
+  probe_labels=tf.compat.v1.placeholder(tf.float32,shape=(None,num_classes))
 
   probe_first_layer=probe_input
 
@@ -71,13 +71,13 @@ def probe_train_eval(probe_train_input,y_train1,num_classes,probe_eval_input,y_t
 
   # Tensorflow training operations defined.
   learning_rate=0.1
-  trainable_variables = tf.trainable_variables()
+  trainable_variables = tf.compat.v1.trainable_variables()
   grads = tf.gradients(probe_cost_2,trainable_variables)
 
   if probe_optimizer == 'sgd':
-    optimizer = tf.train.GradientDescentOptimizer(learning_rate)
+    optimizer = tf.compat.v1.train.GradientDescentOptimizer(learning_rate)
   elif probe_optimizer == 'mom':
-    optimizer = tf.train.MomentumOptimizer(learning_rate,0.9)
+    optimizer = tf.compat.v1.train.MomentumOptimizer(learning_rate,0.9)
   probe_train_op = optimizer.apply_gradients(zip(grads, trainable_variables),name='train_step')
 
   probe_truth = tf.argmax(probe_labels, axis=1)
@@ -87,13 +87,13 @@ def probe_train_eval(probe_train_input,y_train1,num_classes,probe_eval_input,y_t
   num_examples=len(probe_val)
   batch_size=128
 
-  saver=tf.train.Saver()
+  saver=tf.compat.v1.train.Saver()
   probe_val_2=probe_eval_input
 
   print("Start Training Probe Model.....")
   # Training Session that runs the training operation after initialization
   with tf.Session() as sess:
-    sess.run(tf.global_variables_initializer())
+    sess.run(tf.compat.v1.global_variables_initializer())
     global_step=0
     for i in range(epochs):
       print(i)
