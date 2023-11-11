@@ -30,3 +30,18 @@ the user through the various steps of the notebook.
 
 - [GLRMExplainer and BRCGExplainer using Boston, Breast-cancer datasets](./rbm) [[on nbviewer](https://nbviewer.jupyter.org/github/IBM/AIX360/tree/master/examples/rbm/)]
 
+- [OTMatchingExplainer on Sentence Matching in NLP](./matching) [[on nbviewer](https://nbviewer.jupyter.org/github/IBM/AIX360/tree/master/examples/matching/matching-pairs-of-sentences.ipynb)]
+
+- [NearestNeighborContrastiveExplainer using Breast Cancer wisconsin dataset](./nncontrastive/nncontrastive_demo.ipynb)[[on nbviewer](https://nbviewer.org/github/Trusted-AI/AIX360/blob/master/examples/nncontrastive/nncontrastive_demo.ipynb)]
+
+- [TSICEExplainer using Sunspots dataset](./tsice/tsice_demo.ipynb)[[on nbviewer](https://nbviewer.org/github/Trusted-AI/AIX360/blob/master/examples/tsice/tsice_demo.ipynb)]
+
+- [TSSaliencyExplainer using FordA dataset](./tssaliency/tssaliency_univariate_demo.ipynb)[[on nbviewer](https://nbviewer.org/github/Trusted-AI/AIX360/blob/master/examples/tssaliency/tssaliency_univariate_demo.ipynb)]
+
+- [TSSaliencyExplainer using Climate dataset](./tssaliency/tssaliency_multivariate_demo.ipynb)[[on nbviewer](https://nbviewer.org/github/Trusted-AI/AIX360/blob/master/examples/tssaliency/tssaliency_multivariate_demo.ipynb)]
+
+- [TSLimeExplainer using FordA dataset](./tslime/tslime_univariate_demo.ipynb)[[on nbviewer](https://nbviewer.org/github/Trusted-AI/AIX360/blob/master/examples/tslime/tslime_univariate_demo.ipynb)]
+
+- [TSLimeExplainer using Climate dataset](./tslime/tslime_multivariate_demo.ipynb)[[on nbviewer](https://nbviewer.org/github/Trusted-AI/AIX360/blob/master/examples/tslime/tslime_multivariate_demo.ipynb)]
+
+- [GroupedCEExplainer using Diabetes dataset](./gce/gce_demo.ipynb)[[on nbviewer](https://nbviewer.org/github/Trusted-AI/AIX360/blob/master/examples/gce/gce_demo.ipynb)]
